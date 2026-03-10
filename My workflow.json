@@ -1,0 +1,163 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "743aaa15-9b28-4d3b-9cc7-304192402269",
+      "name": "When chat message received",
+      "webhookId": "823789e7-89d7-4d61-b46f-593ca4424fb3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        0
+      ],
+      "id": "ff482a8f-f757-45f1-9961-565d64c42f5d",
+      "name": "AI Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        192
+      ],
+      "id": "f90bbf81-7b16-41e3-a7cf-05213613be97",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "96Pai48zK3gtMIXG",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        192
+      ],
+      "id": "02c7afc2-15dc-4d43-9398-5de7f353ca99",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        192
+      ],
+      "id": "9d51b3ce-3f26-4032-859f-0219396a72cd",
+      "name": "Send Email",
+      "webhookId": "ae55fa8c-5a60-468d-8a7f-e61fc573ebcf",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Sr9dxPG6BOt5xLw",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "AI Agent": [
+      {
+        "json": {
+          "output": "I can — I just need the email details before I send. Please provide (or pick a template):\n\n1) Subject:\n2) Message body (what you want to say):\n3) Sender name/signature to appear:\n4) Any CC/BCC addresses? (optional)\n5) Send now? (yes/no)\n\nQuick templates you can pick instead of typing a custom body:\nA. Short/formal\n- Subject: Quick note\n- Body: Hello Prakhar, I hope you’re well. I wanted to touch base about [topic]. Please let me know a good time to discuss. Best regards, [Your Name]\n\nB. Short/informal\n- Subject: Hey!\n- Body: Hi Prakhar — just checking in about [topic]. Let me know when you’re free. Thanks, [Your Name]\n\nC. Detailed\n- Subject: [Detailed subject about purpose]\n- Body: Hello Prakhar, I’m reaching out regarding [detailed reason]. [Include any specifics, deadlines, questions]. Please reply at your convenience. Regards, [Your Name]\n\nReply with your chosen template (A/B/C) or paste your custom subject/body and any CC/BCC and I’ll send the email."
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f65f07a3-22df-4632-ad6a-903f922de2d1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3dded8ecad057b8b1529a8f88c8939ce6a37a8fbb5f6a348009fa095deaf342"
+  },
+  "id": "DBMnXviJQqam9DX3",
+  "tags": []
+}
