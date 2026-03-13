@@ -1,0 +1,542 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -864,
+        -160
+      ],
+      "id": "46c0cf13-d8a0-473a-804a-899e3096da96",
+      "name": "Telegram Trigger",
+      "webhookId": "41ef2ad6-872f-4f72-be62-601971360036",
+      "credentials": {
+        "telegramApi": {
+          "id": "TBR7TqBJiEhqOXws",
+          "name": "praksy101"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are a personal Ai assistant. Follow the rules below: \n-Default currency is INR .You need not ask from the user about currency before adding in the sheets.\n\n-Use \"Add Expense to Sheet\" tool to add expenses shared by the user . You can track the Expense Category as these values (Food, Travel, Medical, Fuel, Rent, Grocery) based on the user's message. You need not confirm from user before adding in the sheet.\n\n-After adding the expense , please inform that expense is added in the sheet through telegram chat.\n\n-Use \"Read Expenses from Sheet\" tool to read the expense made by the user and give a daily summary in chat. Only show the daily summary when the user explicitly asked for this.\n\n-use \"Add Task in Sheet\" tool to add the task in Todo List Tracker sheet. You need to extract the Task and Priority (High, Medium, Low) from user's message, and set the Status as pending when you add it.\n\n-Use \"Update Task in Sheet\" tool to update the tasks status to Completed based on user's message. User will tell you which task is completed.\n\n-Use \"Read Task in Sheet\" to send a daily pending task reminder to the user outlining the list of task that needs to be done. Group it based on Priority"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -640,
+        -160
+      ],
+      "id": "81a2e4ae-c6a5-448a-a113-27d54025c94e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        80
+      ],
+      "id": "114ec74d-4464-493f-9d3e-67c515caaf36",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "96Pai48zK3gtMIXG",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "praksy101"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        80
+      ],
+      "id": "02f32976-6bec-4f8d-b37b-4795416cb3f8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        -160
+      ],
+      "id": "08ce3e2a-5f14-4642-ae1a-cc5a750ac2cc",
+      "name": "Send a text message",
+      "webhookId": "2669a9ea-5068-45da-b0ba-5edfbd03e45d",
+      "credentials": {
+        "telegramApi": {
+          "id": "TBR7TqBJiEhqOXws",
+          "name": "praksy101"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU",
+          "mode": "list",
+          "cachedResultName": "Todo List tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Task', ``, 'string') }}",
+            "Date": "={{ $now.format('yyyy-MM-dd')}}",
+            "Priority": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Priority', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Task"
+          ],
+          "schema": [
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -320,
+        80
+      ],
+      "id": "9760c9ab-6b33-498d-b87a-9aa84124fe04",
+      "name": "Add Task in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "85j0YgSR7byvfNpV",
+          "name": "praksy101"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU",
+          "mode": "list",
+          "cachedResultName": "Todo List tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        80
+      ],
+      "id": "6a925691-2dbc-48ec-9629-a9534d40be4f",
+      "name": "Read Task in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "85j0YgSR7byvfNpV",
+          "name": "praksy101"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU",
+          "mode": "list",
+          "cachedResultName": "Todo List tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1svVCG700Ud40Z5G-idlBO9YLDB3dFY_6_BYJovQ1qTU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Task__using_to_match_', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "Task"
+          ],
+          "schema": [
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -480,
+        80
+      ],
+      "id": "a5dd8e19-f363-4907-a8dd-ec76f888de9b",
+      "name": "Update task in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "85j0YgSR7byvfNpV",
+          "name": "praksy101"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VWT1a0ZR9mIGpuR_CuydQaeyLQSrcIfsq-0NAjRmzJ8",
+          "mode": "list",
+          "cachedResultName": "Expense Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VWT1a0ZR9mIGpuR_CuydQaeyLQSrcIfsq-0NAjRmzJ8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VWT1a0ZR9mIGpuR_CuydQaeyLQSrcIfsq-0NAjRmzJ8/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        80
+      ],
+      "id": "17d43123-f4fd-4cd7-aeaa-12ae7a9f2639",
+      "name": "Read Expenses from Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "85j0YgSR7byvfNpV",
+          "name": "praksy101"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VWT1a0ZR9mIGpuR_CuydQaeyLQSrcIfsq-0NAjRmzJ8",
+          "mode": "list",
+          "cachedResultName": "Expense Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VWT1a0ZR9mIGpuR_CuydQaeyLQSrcIfsq-0NAjRmzJ8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VWT1a0ZR9mIGpuR_CuydQaeyLQSrcIfsq-0NAjRmzJ8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Expense Category": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Expense_Category', ``, 'string') }}",
+            "Amount": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Amount', ``, 'string') }}",
+            "Date": "={{ $now.format('yyyy-MM-dd')}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Expense Category",
+              "displayName": "Expense Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -16,
+        80
+      ],
+      "id": "d2a75581-0c93-434f-88b2-affbd61b33bd",
+      "name": "Add Expense in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "85j0YgSR7byvfNpV",
+          "name": "praksy101"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Task in Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Task in Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update task in Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Expenses from Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Expense in Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "9ab8eb13-7ca1-4234-9cca-ef269d1f9280",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3dded8ecad057b8b1529a8f88c8939ce6a37a8fbb5f6a348009fa095deaf342"
+  },
+  "id": "7md9XgBzQWCRuf9O",
+  "tags": []
+}
